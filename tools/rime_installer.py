@@ -15,21 +15,37 @@ from pathlib import Path
 
 class RimeInstaller:
     def __init__(self):
-        # 智能檢測資源目錄位置
+        # 智能檢測資源目錄位置 - 支援 PyInstaller 打包環境
         current_dir = Path.cwd()
-        exe_dir = Path(__file__).parent if hasattr(sys, '_MEIPASS') else current_dir
 
-        # 可能的資源目錄位置
+        # 處理 PyInstaller 打包環境
+        if hasattr(sys, '_MEIPASS'):
+            # PyInstaller 打包環境：資源檔案在臨時目錄
+            bundle_dir = Path(sys._MEIPASS)
+            exe_dir = Path(sys.executable).parent
+        else:
+            # 開發環境：使用腳本所在目錄
+            bundle_dir = Path(__file__).parent
+            exe_dir = bundle_dir
+
+        # 可能的資源目錄位置（按優先順序）
         possible_dirs = [
-            current_dir,  # 當前目錄
-            exe_dir,      # 執行檔目錄
-            current_dir.parent,  # 上級目錄
-            exe_dir.parent       # 執行檔上級目錄
+            bundle_dir,           # PyInstaller 資源目錄 / 腳本目錄
+            exe_dir,              # 執行檔目錄（打包後的 rime_files 會在這裡）
+            current_dir,          # 當前工作目錄
+            current_dir.parent,   # 上級目錄
+            exe_dir.parent,       # 執行檔上級目錄
         ]
 
         self.project_root = None
         for directory in possible_dirs:
-            if (directory / "rime_files").exists() or (directory / "release-include.txt").exists():
+            # 在 PyInstaller 環境中，檢查執行檔目錄下是否有 rime_files
+            if hasattr(sys, '_MEIPASS') and directory == exe_dir:
+                if (directory / "rime_files").exists():
+                    self.project_root = directory
+                    break
+            # 在開發環境中，檢查是否有開發檔案
+            elif (directory / "rime_files").exists() or (directory / "release-include.txt").exists():
                 self.project_root = directory
                 break
 

@@ -1,0 +1,162 @@
+# Rime schema
+# encoding: utf-8
+
+schema:
+  schema_id: bp_kb_zu_im
+  name: 閩拼輸入法【注音符號按鍵練習】
+  version: "0.1.0.0"
+  author:
+    - Alan Jui <AlanJui.1960@gmail.com>
+  description: |
+    方音符號：
+      ㄅ ㄆ ㄇ       ㆠ
+      ㄉ ㄊ ㄋ ㄌ
+      ㄍ ㄎ ㄏ ㄫ    ㆣ
+
+      ㄗ ㄘ ㄙ       ㆡ
+      ㄐ ㄑ ㄒ       ㆢ
+
+      ㄧ ㄨ          ㆪ ㆫ
+      ㄚ ㆦ ㄜ ㆤ    ㆧ ㆩ ㆥ
+
+      ㄞ ㄠ          ㆮ ㆯ
+      ㆰ ㆱ ㆬ
+      ㄢ ㄣ ㄤ ㆲ ㄥ ㆭ
+
+switches:
+  - name: ascii_mode
+    reset: 0
+    states: [漢文, ABC]
+  - name: full_shape
+    reset: 0
+    states: [半形, 全形]
+  - name: supers_tone
+    reset: 1
+    states: [一般, 上標]
+
+engine:
+  processors:
+    - punctuator
+    - selector
+    - express_editor
+  segmentors:
+    - punct_segmentor
+  translators:
+    - punct_translator
+
+# punctuator:
+#   import_preset: tlpa_keymap_hong_im
+
+punctuator:
+  half_shape: &symtable
+    "a": { commit: "ㄇ" }  # /bbn/ ==> m
+    "!": { commit: "ㆠ" }  # /bb/ ==> B
+    "1": { commit: "ㄅ" }  # /b/ ==> b
+    "q": { commit: "ㄆ" }  # /p/ ==> p
+    "s": { commit: "ㄋ" }  # /ln/ ==> n
+    "2": { commit: "ㄉ" }  # /d/ ==> d
+    "w": { commit: "ㄊ" }  # /t/ ==> t
+    "x": { commit: "ㄌ" }  # /l/ ==> l
+    "N": { commit: "ㄫ" }  # /ggn/ ==> ŋ
+    "E": { commit: "ㆣ" }  # /gg/ ==> v
+    "e": { commit: "ㄍ" }  # /g/ ==> g
+    "d": { commit: "ㄎ" }  # /k/ ==> k
+    "Y": { commit: "ㆡ" }  # /zz/ ==> Z
+    "y": { commit: "ㄗ" }  # /z/ ==> z
+    "h": { commit: "ㄘ" }  # /c/ ==> c
+    "n": { commit: "ㄙ" }  # /s/ ==> s
+    "R": { commit: "ㆢ" }  # /jj/ ==> J
+    "r": { commit: "ㄐ" }  # /j/ ==> j
+    "f": { commit: "ㄑ" }  # /ch/ ==> C
+    "v": { commit: "ㄒ" }  # /sh/ ==> S
+    "c": { commit: "ㄏ" }  # /h/ ==> h
+    "8": { commit: "ㄚ" }  # /a/ ==> a
+    "u": { commit: "ㄧ" }  # /i/ ==> i
+    "K": { commit: "ㆨ" }  # /eu/ ==> w
+    "j": { commit: "ㄨ" }  # /u/ ==> u
+    ",": { commit: "ㆤ" }  # /e/ ==> e
+    "i": { commit: "ㆦ" }  # /oo/ ==> O
+    "k": { commit: "ㄜ" }  # /o/ ==> o
+    "9": { commit: "ㄞ" }  # /ai/ ==> I
+    "l": { commit: "ㄠ" }  # /au/ ==> U
+    "*": { commit: "ㆩ" }  # /na/ ==> R
+    "U": { commit: "ㆪ" }  # /ni/ ==> D
+    "J": { commit: "ㆫ" }  # /nu/ ==> X
+    "<": { commit: "ㆥ" }  # /ne/ ==> E
+    "I": { commit: "ㆧ" }  # /no/ ==> Q
+    "(": { commit: "ㆮ" }  # /nai/ ==> x
+    "L": { commit: "ㆯ" }  # /nau/ ==> y
+    "m": { commit: "ㆬ" }  # /m/ ==> M
+    "p": { commit: "ㄣ" }  # /n/ ==> N
+    "/": { commit: "ㆭ" }  # /ng/ ==> G
+    "M": { commit: "ㆰ" }  # /am/ ==> Y
+    "0": { commit: "ㄢ" }  # /an/ ==> @
+    ";": { commit: "ㄤ" }  # /ang/ ==> A
+    "O": { commit: "ㆱ" }  # /om/ ==> W
+    "o": { commit: "ㆲ" }  # /ong/ ==> H
+    "b": { commit: "ㆴ" }  # /p/ ==> P
+    "t": { commit: "ㆵ" }  # /t/ ==> T
+    "g": { commit: "ㆻ" }  # /k/ ==> K
+    "z": { commit: "ㆷ" }  # /h/ ==> V
+    #-----------------------------------------------
+    # " ": [ "", "ˉ", "1", "¹" ]
+    # "4": [ "ˋ", "2", "²" ]
+    # "3": [ "˪", "3", "³" ]
+    # "6": [ "ˊ", "5", "⁵" ]
+    # "5": [ "˫", "7", "⁷" ]
+    # "7": [ "˙", "4", "8", "0", "⁴", "⁸", "⁰" ]
+    #-----------------------------------------------
+    # 陰平、陰去
+    ":": { commit: "ˉ" }  # /1/ ==> 1
+    "[": { commit: "ˉ" }  # /7/ ==> 7
+    # 上聲
+    "4": { commit: "ˇ" }  # /3/ ==> 3
+    # 陽平、陽入
+    "6": { commit: "ˊ" }  # /2/ ==> 2
+    "]": { commit: "ˊ" }  # /8/ ==> 8
+    # 陰去、陽去
+    "3": { commit: "ˋ" }  # /5/ ==> 5
+    "5": { commit: "^" }  # /6/ ==> 6
+    # 輕聲
+    "7": { commit: "˙" }  # /0/ ==> 0
+    #-----------------------------------------------
+    # ".": [ "入", "ㆴ", "ㆵ", "ㆻ", "ㆷ" ]
+    ".": { commit: "入" }  # /9/ ==> 9
+    "?": { commit: "ㄥ" }  # /nn/ ==> L
+    "-": { commit: "ñ" }  # /*nn/ ==> *
+    "-": { commit: "ñ" }  # /*nn/ ==> *
+    "=": { commit: "ㄥ" }  # /nn/ ==> L
+full_shape:
+  ".": 。
+
+key_binder:
+  bindings:
+    #---------------------------------------------------
+    # 使用【_】鍵，輸入【調號】：3 （低音調）
+    - { when: composing, accept: underscore, send: underscore }
+    - { when: has_menu, accept: underscore, send: underscore  }
+    #---------------------------------------------------
+    # 使用【-】鍵，輸入【調號】：7 （中音調）
+    - { when: composing, accept: minus, send: minus }
+    - { when: has_menu, accept: minus, send: minus  }
+    #---------------------------------------------------
+    # 使用 【.】鍵，輸入【調號】：0（輕聲及入聲調）
+    - { when: composing, accept: period, send: period }
+    - { when: has_menu, accept: period, send: period }
+    #---------------------------------------------------
+    # 翻頁
+    #---------------------------------------------------
+    - { accept: "Control+p", send: Page_Up, when: composing }
+    - { accept: "Control+n", send: Page_Down, when: composing }
+    #---------------------------------------------------
+    # Vim Mode
+    #---------------------------------------------------
+    - { when: has_menu, accept: "Control+h", send: Page_Up }
+    - { when: has_menu, accept: "Control+l", send: Page_Down }
+    - { when: has_menu, accept: "Control+k", send: Up }
+    - { when: has_menu, accept: "Control+j", send: Down }
+
+menu:
+  alternative_select_labels: [ ①, ②, ③, ④, ⑤ ]  # 修改候選標籤
+  alternative_select_keys: 12345 #如編碼字符佔用數字鍵則須另設選字鍵
+  page_size: 5 #選單每䈎顯示個數

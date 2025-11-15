@@ -1,0 +1,30 @@
+customization:
+  distribution_code_name: Weasel
+  distribution_version: 0.16.0
+  generator: "Rime::SwitcherSettings"
+  modified_time: "Tue May 21 13:16:35 2024"
+  rime_version: 1.11.2
+patch:
+  "log/level": "info"
+  schema_list:
+    #------------------------------------------------------------------------
+    # 閩拼方案（BP）輸入法
+    #------------------------------------------------------------------------
+    - { schema: bp_kb_zu_im } # 閩拚輸入法注音符號按鍵練習
+    - { schema: bp_phing_im } # 閩拼方案輸入法
+    - { schema: bp_hong_im }  # 閩拼方案輸入法
+    #------------------------------------------------------------------------
+    # RIME 官方輸入法
+    #------------------------------------------------------------------------
+    # - {schema: luna_pinyin}
+    # - {schema: stroke}
+    # - {schema: cangjie5}
+    # - {schema: terra_pinyin}
+    # - {schema: luna_pinyin_simp}
+    # - {schema: luna_pinyin_fluency}
+    # - {schema: cangjie5_express}
+    # - {schema: bopomofo}
+    # - {schema: bopomofo_express}
+    # - {schema: bopomofo_tw}
+    # - {schema: luna_pinyin_tw}
+

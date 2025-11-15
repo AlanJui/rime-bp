@@ -1,0 +1,15 @@
+# --- 鍵盤按鍵練習工具 ---
+bp_kb_zu_im.schema.yaml
+
+# --- 共用函式庫/工具 ---
+keymap_piau_tian.yaml
+bp_libs_hst_phing_im.yaml
+bp_libs_hst_zu_im.yaml
+bp_libs.yaml
+custom_phrase.txt
+rime.lua
+
+# --- 【閩拼方案輸入法】 ---
+bp_hong_im.schema.yaml
+bp_phing_im.schema.yaml
+bp_ji_khoo.dict.yaml
