@@ -4,7 +4,7 @@
 
 schema:
   schema_id: bp_hong_im
-  name: 注音輸入法【閩拼方案】
+  name: 閩拚輸入法【注音符號】
   version: "v0.1.0.0"
   author: 居正中
   description: |
@@ -16,8 +16,6 @@ schema:
     【聲調標示】：
       (1) 台羅八聲調；
       (2) 使用數值標示聲調，以利閱讀。
-  dependencies:
-    - stroke
 
 switches:
   - name: ascii_mode

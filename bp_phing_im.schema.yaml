@@ -4,7 +4,7 @@
 
 schema:
   schema_id: bp_phing_im
-  name: 拼音輸入法【閩拼方案】
+  name: 閩拚輸入法【拚音字母】
   version: "v0.1.0.0"
   author:
     - 居正中 <alanjui.1960@gmail.com>
