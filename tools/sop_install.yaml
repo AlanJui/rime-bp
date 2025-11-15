@@ -1,0 +1,200 @@
+name: "閩拚輸入法 - 小狼毫（RIME）安裝作業程序"
+version: "1.2.0"
+description: >
+  於 Windows 11 + 小狼毫（Weasel）環境中，使用 PowerShell 完成閩拚輸入法配置檔案的部署流程。
+  此文件提供自動與手動兩種程序，依序執行即可完成安裝與驗證。
+
+prerequisites:
+  - "Windows 11，並已安裝小狼毫（Weasel）輸入法主程式。"
+  - "PowerShell 5.1 (Windows PowerShell) 或 PowerShell 7 以上版本。"
+  - "已下載本專案完整資料夾（含 release、config、tools 等子目錄）。"
+  - "具備 Python 3.9+（僅在執行自動安裝腳本及驗證工具時需要）。"
+
+steps:
+  - name: "初始化 PowerShell 會話與主要路徑"
+    run: |
+      # 自專案根目錄啟動 PowerShell，並於同一個工作階段中依序執行各步驟。
+      Set-ExecutionPolicy -Scope Process -ExecutionPolicy RemoteSigned -Force
+      $ErrorActionPreference = "Stop"
+      $ProjectRoot   = Convert-Path .
+      $ReleaseRoot   = Join-Path $ProjectRoot 'release'
+      $ToolsRoot     = Join-Path $ProjectRoot 'tools'
+      $InstallerPy   = Join-Path $ToolsRoot 'rime_installer.py'
+      $IncludeList   = Join-Path $ProjectRoot 'release-include.txt'
+      $RimeDir       = Join-Path $env:APPDATA 'Rime'
+      $Timestamp     = Get-Date -Format 'yyyyMMdd_HHmmss'
+      Write-Host "🧭 ProjectRoot : $ProjectRoot"
+      Write-Host "📁 ReleaseRoot : $ReleaseRoot"
+      Write-Host "📄 IncludeList : $IncludeList"
+      Write-Host "🏡 RimeDir     : $RimeDir"
+      Write-Host "🕒 Timestamp   : $Timestamp"
+
+  - name: "檢查必要條件與可用資源"
+    run: |
+      $RimeDir = Join-Path $env:APPDATA 'Rime'
+      if (-not (Test-Path $RimeDir)) {
+        throw "找不到 RIME 設定目錄：$RimeDir，請先安裝小狼毫再繼續。"
+      }
+
+      if (-not (Test-Path '.\release-include.txt')) {
+        throw "release-include.txt 未就緒，無法判定需部署之檔案。"
+      }
+
+      if (-not (Test-Path '.\release')) {
+        throw "release 目錄缺失，請先依 _202_打包作業程序書.md 建置發布資源。"
+      }
+
+      if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
+        throw "未找到 Python 執行檔，請安裝 Python 3.9 以上版本。"
+      }
+
+      Write-Host "✅ 環境檢查通過，可進行下一步。"
+
+  - name: "解壓與同步發佈資源（如有最新 ZIP）"
+    run: |
+      $ReleaseRoot = Join-Path (Convert-Path .) 'release'
+      $RimeFilesDir = Join-Path $ReleaseRoot 'rime_files'
+
+      if (-not (Test-Path $RimeFilesDir)) {
+        Write-Host "⚠️  未發現 release\rime_files，將嘗試解壓最新 ZIP。"
+        $LatestZip = Get-ChildItem -Path $ReleaseRoot -Filter '*.zip' |
+                     Sort-Object LastWriteTime -Descending |
+                     Select-Object -First 1
+        if ($null -eq $LatestZip) {
+          throw "release 目錄內不存在 ZIP 套件，請先建置或下載正式安裝包。"
+        }
+
+        $TempExtract = Join-Path $ReleaseRoot 'extracted'
+        if (Test-Path $TempExtract) { Remove-Item -Recurse -Force $TempExtract }
+
+        Expand-Archive -Path $LatestZip.FullName -DestinationPath $TempExtract -Force
+
+        if (Test-Path (Join-Path $TempExtract 'rime_files')) {
+          Move-Item -Path (Join-Path $TempExtract 'rime_files') -Destination $RimeFilesDir -Force
+        } else {
+          Move-Item -Path (Join-Path $TempExtract '*') -Destination $ReleaseRoot -Force
+        }
+
+        Remove-Item -Recurse -Force $TempExtract
+        Write-Host "✅ 已從 $($LatestZip.Name) 解壓完成。"
+      } else {
+        Write-Host "✅ 發布用 rime_files 已存在，跳過解壓作業。"
+      }
+
+  - name: "備份使用者自訂檔案（含時間戳記）"
+    run: |
+      $RimeDir   = Join-Path $env:APPDATA 'Rime'
+      $Timestamp = Get-Date -Format 'yyyyMMdd_HHmmss'
+      $BackupTargets = @(
+        'default.custom.yaml',
+        'rime.lua',
+        'custom_phrase.txt'
+      )
+
+      foreach ($file in $BackupTargets) {
+        $Source = Join-Path $RimeDir $file
+        if (Test-Path $Source) {
+          $Backup = "$Source.bak_$Timestamp"
+          Copy-Item -Path $Source -Destination $Backup -Force
+          Write-Host "📦 已備份 $file -> $Backup"
+        } else {
+          Write-Host "ℹ️  $file 不存在，略過備份。"
+        }
+      }
+
+  - name: "建議流程：執行 Python 自動安裝腳本"
+    run: |
+      $InstallerPy = Join-Path (Join-Path (Convert-Path .) 'tools') 'rime_installer.py'
+      if (-not (Test-Path $InstallerPy)) {
+        throw "找不到 Python 安裝腳本：$InstallerPy"
+      }
+
+      Write-Host "🚀 以 Python 執行 rime_installer.py，自動完成檔案複製與重新部署。"
+      python $InstallerPy
+      Write-Host "若上述腳本成功完成，後續手動步驟可視情況略過。"
+
+  - name: "手動部署方案檔案（僅在未執行自動腳本時）"
+    run: |
+      $ProjectRoot = Convert-Path .
+      $RimeDir     = Join-Path $env:APPDATA 'Rime'
+      $IncludeFile = Join-Path $ProjectRoot 'release-include.txt'
+      $IncludeList = Get-Content $IncludeFile | Where-Object {
+        ($_ -ne '') -and (-not $_.Trim().StartsWith('#'))
+      }
+
+      $MissingFiles = @()
+      foreach ($relative in $IncludeList) {
+        $Source = Join-Path $ProjectRoot $relative
+        $Destination = Join-Path $RimeDir (Split-Path $relative -Leaf)
+        if (Test-Path $Source) {
+          Copy-Item -Path $Source -Destination $Destination -Force
+          Write-Host "✅ 已複製 $relative -> $Destination"
+        } else {
+          Write-Host "❌ 找不到 $relative"
+          $MissingFiles += $relative
+        }
+      }
+
+      if ($MissingFiles.Count -gt 0) {
+        throw "有 $($MissingFiles.Count) 個檔案缺失，請檢查 release-include.txt 與實際檔案。"
+      }
+
+  - name: "手動覆蓋 default.custom.yaml（若未透過腳本）"
+    run: |
+      $ProjectRoot = Convert-Path .
+      $RimeDir     = Join-Path $env:APPDATA 'Rime'
+      $RimeFiles   = Join-Path $ProjectRoot 'release\rime_files\default.custom.yaml'
+      $ConfigFile  = Join-Path $ProjectRoot 'config\default.custom.yaml'
+
+      if (Test-Path $RimeFiles) {
+        Copy-Item -Path $RimeFiles -Destination (Join-Path $RimeDir 'default.custom.yaml') -Force
+        Write-Host "✅ 已使用 release\\rime_files 版本覆蓋 default.custom.yaml"
+      } elseif (Test-Path $ConfigFile) {
+        Copy-Item -Path $ConfigFile -Destination (Join-Path $RimeDir 'default.custom.yaml') -Force
+        Write-Host "✅ 已使用 config 版本覆蓋 default.custom.yaml"
+      } else {
+        throw "找不到可用的 default.custom.yaml，請確認來源檔案是否存在。"
+      }
+
+  - name: "觸發小狼毫重新部署"
+    run: |
+      $CandidatePaths = @(
+        'C:\Program Files\Rime',
+        'C:\Program Files (x86)\Rime'
+      )
+
+      $Deployer = $null
+      foreach ($base in $CandidatePaths) {
+        if (-not (Test-Path $base)) { continue }
+        $Match = Get-ChildItem -Path $base -Directory -Filter 'weasel-*' |
+                 Sort-Object LastWriteTime -Descending |
+                 Select-Object -First 1
+        if ($Match) {
+          $Candidate = Join-Path $Match.FullName 'WeaselDeployer.exe'
+          if (Test-Path $Candidate) {
+            $Deployer = $Candidate
+            break
+          }
+        }
+      }
+
+      if ($Deployer) {
+        & $Deployer /deploy
+      } else {
+        Write-Host "⚠️  未自動找到 WeaselDeployer.exe，請於系統匣手動選擇「重新部署」。"
+      }
+
+  - name: "驗證輸入方案與辭典"
+    run: |
+      # 1. 檢查檔案是否已到位
+      $RimeDir = Join-Path $env:APPDATA 'Rime'
+      Get-ChildItem -Path $RimeDir -Filter 'bp_*.schema.yaml'
+
+      # 2. 使用 python 工具檢查釋出檔案（若有 test_xlit_rules.py 或 test_bp_processing.py）
+      if (Test-Path '.\test\test_bp_processing.py') {
+        python -m pytest test\test_bp_processing.py
+      } else {
+        Write-Host "ℹ️  若需更完整的驗證，可執行工具\test_xlit_rules.py 或 pytest。"
+      }
+
+      Write-Host "🎉 安裝流程完成，請於桌面系統匣的小狼毫圖示右鍵，確認輸入方案列表已出現「閩拚」相關方案。"
