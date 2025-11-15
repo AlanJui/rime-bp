@@ -11,6 +11,7 @@ pip install pyinstaller
 ### 2. 基本打包命令
 
 #### 打包 test_xlit_rules.py
+
 ```bash
 # 產生單一 .exe 檔案
 pyinstaller --onefile tools/test_xlit_rules.py
@@ -27,7 +28,7 @@ pyinstaller --onefile --windowed tools/test_xlit_rules.py
 ```bash
 # 自訂輸出檔名和圖示
 pyinstaller --onefile \
-           --name "RIME_TLPA_Validator" \
+           --name "RIME_Validator" \
            --icon="icon.ico" \
            --console \
            tools/test_xlit_rules.py
@@ -46,18 +47,21 @@ pyinstaller --onefile \
 ### 5. 輸出位置
 
 編譯完成後，.exe 檔案會在：
+
 - `dist/` 目錄中
 - 檔名為腳本名稱或 `--name` 指定的名稱
 
 ### 6. 常見問題解決
 
 #### 缺少模組錯誤
+
 ```bash
 # 手動指定隱藏匯入
 pyinstaller --onefile --hidden-import=module_name script.py
 ```
 
 #### 檔案大小過大
+
 ```bash
 # 排除不必要的套件
 pyinstaller --onefile --exclude-module=tkinter script.py

@@ -13,7 +13,7 @@ from datetime import datetime
 from pathlib import Path
 
 
-class RimeTLPAInstaller:
+class RimeInstaller:
     def __init__(self):
         # 智能檢測資源目錄位置
         current_dir = Path.cwd()
@@ -83,6 +83,22 @@ class RimeTLPAInstaller:
             return True
         else:
             print("📋 default.custom.yaml 不存在，無需備份")
+            return False
+
+    def backup_existing_files(self, backup_file):
+        """備份使用者已在使用中的檔案，如：rime.lua、custom_phrase.txt"""
+        default_custom = self.rime_dir / backup_file
+
+        if default_custom.exists():
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            backup_name = f"default.custom.yaml.bak_{timestamp}"
+            backup_path = self.rime_dir / backup_name
+
+            shutil.copy2(default_custom, backup_path)
+            print(f"📋 已備份 {backup_file} 為: {backup_name}")
+            return True
+        else:
+            print(f"📋 {backup_file} 不存在，無需備份")
             return False
 
     def copy_rime_files(self):
@@ -224,6 +240,9 @@ class RimeTLPAInstaller:
 
         # 2. 備份現有配置
         self.backup_default_custom()
+        backup_files = ["rime.lua", "custom_phrase.txt"]
+        for bf in backup_files:
+            self.backup_existing_files(bf)
 
         # 3. 複製 RIME 配置檔案
         copied_count, failed_files = self.copy_rime_files()
@@ -259,7 +278,7 @@ class RimeTLPAInstaller:
 
 def main():
     """主函式"""
-    installer = RimeTLPAInstaller()
+    installer = RimeInstaller()
 
     try:
         success = installer.install()
