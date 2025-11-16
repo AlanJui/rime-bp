@@ -19,7 +19,8 @@
      - 【拼音輸入法】：使用數值標示聲調，以利閱讀。
      - 【注音輸入法】：使用【閩拼】聲調符號，代替【方音符號】標示聲調。
 
-![2025-10-21_20-34-31](https://github.com/user-attachments/assets/cb6beb1c-6b19-4a2f-abd1-1cb470ea4edb)
+![2025-11-16_20-05-45](https://github.com/user-attachments/assets/39b91a19-4652-43bc-af81-291a4ccd8cc7)
+
 
 ## 安裝作業
 
@@ -231,4 +232,5 @@ RIME 設定檔名稱為：`default.custom.yaml`，各作業系統之 RIME 設定
 - [RIME輸入法 - 閩南語輸入方案](https://github.com/a-thok/rime-hokkien)
 
 - [rime-hokkien-poj](https://github.com/yangwenbo99/rime-hokkien-poj)
+
 
