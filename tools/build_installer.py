@@ -397,4 +397,7 @@ def main():
 
 if __name__ == "__main__":
     success = main()
-    input(f"\n{'✅ 打包成功!' if success else '❌ 打包失敗!'} 按 Enter 鍵結束...")
+    # 只在互動式環境中等待使用者輸入
+    if sys.stdin.isatty():
+        input(f"\n{'✅ 打包成功!' if success else '❌ 打包失敗!'} 按 Enter 鍵結束...")
+    sys.exit(0 if success else 1)
