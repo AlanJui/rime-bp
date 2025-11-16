@@ -1,6 +1,11 @@
-# RIME 工具打包指南
+# Python Script 打包作業指引
+
+指引使用者如何將 Python Script 包娤成 .exe 執行檔。
 
 ## 使用 PyInstaller 創建 .exe 檔案
+
+1. 安裝 PyInstaller 套件
+2. 將 Python Script 打包成 exe 執行檔
 
 ### 1. 安裝 PyInstaller
 

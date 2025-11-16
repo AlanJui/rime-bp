@@ -26,6 +26,70 @@ on:
         default: false
 
 jobs:
+  build-windows-installer:
+    runs-on: windows-latest
+    steps:
+      - name: Resolve ref / tag
+        id: meta
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "REF=${{ github.event.inputs.ref }}" >> $GITHUB_OUTPUT
+            echo "TAG=${{ github.event.inputs.tag_name }}" >> $GITHUB_OUTPUT
+            echo "PRERELEASE=${{ github.event.inputs.prerelease }}" >> $GITHUB_OUTPUT
+          else
+            echo "REF=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "TAG=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "PRERELEASE=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ steps.meta.outputs.REF }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install PyInstaller
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller
+
+      - name: Build Windows installer
+        run: |
+          cd tools
+          python build_installer.py
+        shell: pwsh
+
+      - name: Create installer package ZIP
+        env:
+          TAG: ${{ steps.meta.outputs.TAG }}
+        run: |
+          $tag = "$env:TAG"
+          $zipName = "rime-bp-installer-${tag}.zip"
+          Compress-Archive -Path "release\installer_package\*" -DestinationPath "dist\$zipName"
+
+          # Generate SHA256
+          $hash = Get-FileHash "dist\$zipName" -Algorithm SHA256
+          "$($hash.Hash.ToLower())  $zipName" | Out-File -FilePath "dist\${zipName}.sha256" -Encoding ASCII
+
+          Write-Host "Created: $zipName"
+          Get-Item "dist\$zipName" | Format-List Name, Length
+        shell: pwsh
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: |
+            dist/*.zip
+            dist/*.sha256
+          retention-days: 1
+
   build-bundles:
     runs-on: ubuntu-latest
     steps:
@@ -193,12 +257,91 @@ jobs:
           make_zip "zu2"  "dist/zu2.final"
           make_zip "bp"   "dist/bp.final"
 
-      - name: Create / Update GitHub Release + upload 4 assets
+      - name: Upload YAML bundles artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: yaml-bundles
+          path: |
+            dist/*.zip
+            dist/*.sha256
+          retention-days: 1
+
+  create-release:
+    needs: [build-windows-installer, build-bundles]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve ref / tag
+        id: meta
+        shell: bash
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "REF=${{ github.event.inputs.ref }}" >> $GITHUB_OUTPUT
+            echo "TAG=${{ github.event.inputs.tag_name }}" >> $GITHUB_OUTPUT
+            echo "PRERELEASE=${{ github.event.inputs.prerelease }}" >> $GITHUB_OUTPUT
+          else
+            echo "REF=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "TAG=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+            echo "PRERELEASE=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Prepare release files
+        run: |
+          mkdir -p release-files
+          # 複製 YAML bundles
+          if [ -d "artifacts/yaml-bundles" ]; then
+            cp artifacts/yaml-bundles/* release-files/ || true
+          fi
+          # 複製 Windows installer
+          if [ -d "artifacts/windows-installer" ]; then
+            cp artifacts/windows-installer/* release-files/ || true
+          fi
+
+          echo "=== Release files ==="
+          ls -lh release-files/
+
+      - name: Create / Update GitHub Release + upload all assets
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.meta.outputs.TAG }}
           target_commitish: ${{ steps.meta.outputs.REF }}
-          prerelease: ${{ github.event.inputs.prerelease || false }} # ← 布林，不用字串
+          prerelease: ${{ github.event.inputs.prerelease || false }}
+          body: |
+            ## RIME 閩拚輸入法 ${{ steps.meta.outputs.TAG }}
+
+            ### 📦 安裝程式（推薦）
+
+            **Windows 使用者**：
+            1. 下載 `rime-bp-installer-${{ steps.meta.outputs.TAG }}.zip`
+            2. 解壓縮後執行 `rime_installer.exe`
+            3. 按照程式指示完成安裝
+
+            ### 📋 手動安裝包
+
+            - **rime-tlpa-all-${{ steps.meta.outputs.TAG }}.zip**: 完整版（包含所有方案）
+            - **rime-tlpa-tlpa-${{ steps.meta.outputs.TAG }}.zip**: TLPA 台羅拼音方案
+            - **rime-tlpa-zu2-${{ steps.meta.outputs.TAG }}.zip**: 注音二式方案
+            - **rime-tlpa-bp-${{ steps.meta.outputs.TAG }}.zip**: 閩拼方案
+
+            ### 📝 安裝說明
+
+            **使用安裝程式**（推薦）：
+            - 適用於所有 Windows 使用者
+            - 自動備份現有配置
+            - 一鍵完成安裝
+
+            **手動安裝**：
+            1. 下載對應的 ZIP 檔案
+            2. 解壓縮到 RIME 配置目錄：`%APPDATA%\Rime`
+            3. 重新部署 RIME
+
+            ---
+
+            SHA256 校驗碼請參考 `.sha256` 檔案
           files: |
-            dist/*.zip
-            dist/*.sha256
+            release-files/*.zip
+            release-files/*.sha256
