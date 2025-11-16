@@ -144,7 +144,7 @@ class RimeInstaller:
                     shutil.copy2(src_file, dst_file)
                     print(f"   ✅ 已複製: {src_file.name}")
                     copied_count += 1
-                except Exception as e:
+                except (OSError, shutil.Error) as e:
                     print(f"   ❌ 複製失敗: {src_file.name} - {e}")
                     failed_files.append(src_file.name)
 
@@ -174,7 +174,7 @@ class RimeInstaller:
                     shutil.copy2(src_file, dst_file)
                     print(f"   ✅ 已複製: {file_name}")
                     copied_count += 1
-                except Exception as e:
+                except (OSError, shutil.Error) as e:
                     print(f"   ❌ 複製失敗: {file_name} - {e}")
                     failed_files.append(file_name)
             else:
@@ -191,13 +191,108 @@ class RimeInstaller:
         return copied_count, failed_files
 
     def copy_default_custom(self):
-        """複製新的 default.custom.yaml"""
+        """智能更新 default.custom.yaml，加入閩拼輸入法設定"""
+        dst_file = self.rime_dir / "default.custom.yaml"
+        
+        # 閩拼輸入法的 schema 設定
+        bp_schemas = [
+            "    - { schema: bp_kb_zu_im } # 閩拚輸入法注音符號按鍵練習",
+            "    - { schema: bp_phing_im } # 閩拼方案輸入法",
+            "    - { schema: bp_hong_im }  # 閩拼方案輸入法"
+        ]
+        
+        # 檢查使用者是否已有 default.custom.yaml
+        if not dst_file.exists():
+            # 沒有檔案，從範本複製
+            return self._copy_default_custom_from_template(dst_file)
+        
+        # 讀取現有檔案
+        try:
+            with open(dst_file, 'r', encoding='utf-8') as f:
+                content = f.read()
+                lines = content.splitlines()
+            
+            # 檢查是否已包含閩拼輸入法設定
+            if 'bp_phing_im' in content or 'bp_hong_im' in content or 'bp_kb_zu_im' in content:
+                print("ℹ️  default.custom.yaml 已包含閩拼輸入法設定，跳過")
+                return True
+            
+            # 尋找 schema_list 區段並加入閩拼設定
+            updated_lines = []
+            in_schema_list = False
+            schema_list_found = False
+            indent_added = False
+            
+            for i, line in enumerate(lines):
+                updated_lines.append(line)
+                
+                # 偵測 schema_list 區段
+                if 'schema_list:' in line:
+                    in_schema_list = True
+                    schema_list_found = True
+                    continue
+                
+                # 在 schema_list 區段中
+                if in_schema_list:
+                    # 偵測區段結束（下一個同層級或更高層級的 key）
+                    if line and not line.startswith(' ') and not line.startswith('\t'):
+                        # 區段結束，在此之前插入閩拼設定
+                        if not indent_added:
+                            # 插入註解和設定
+                            insert_pos = len(updated_lines) - 1
+                            updated_lines.insert(insert_pos, "    #------------------------------------------------------------------------")
+                            updated_lines.insert(insert_pos + 1, "    # 閩拼方案（BP）輸入法")
+                            updated_lines.insert(insert_pos + 2, "    #------------------------------------------------------------------------")
+                            for j, schema_line in enumerate(bp_schemas):
+                                updated_lines.insert(insert_pos + 3 + j, schema_line)
+                            indent_added = True
+                        in_schema_list = False
+                    # 檢查是否還在 schema_list 的子項目中
+                    elif line.strip().startswith('- '):
+                        continue
+            
+            # 如果到檔案結尾還在 schema_list 中，在最後加入
+            if in_schema_list and not indent_added:
+                updated_lines.append("    #------------------------------------------------------------------------")
+                updated_lines.append("    # 閩拼方案（BP）輸入法")
+                updated_lines.append("    #------------------------------------------------------------------------")
+                for schema_line in bp_schemas:
+                    updated_lines.append(schema_line)
+                indent_added = True
+            
+            # 如果找不到 schema_list，在檔案末尾加入完整設定
+            if not schema_list_found:
+                updated_lines.append("")
+                updated_lines.append("patch:")
+                updated_lines.append("  schema_list:")
+                updated_lines.append("    #------------------------------------------------------------------------")
+                updated_lines.append("    # 閩拼方案（BP）輸入法")
+                updated_lines.append("    #------------------------------------------------------------------------")
+                for schema_line in bp_schemas:
+                    updated_lines.append(schema_line)
+                indent_added = True
+            
+            if indent_added:
+                # 寫回檔案
+                with open(dst_file, 'w', encoding='utf-8') as f:
+                    f.write('\n'.join(updated_lines))
+                print("✅ 已在 default.custom.yaml 中加入閩拼輸入法設定")
+                return True
+            else:
+                print("⚠️  無法更新 default.custom.yaml")
+                return False
+                
+        except Exception as e:
+            print(f"❌ 更新 default.custom.yaml 時發生錯誤: {e}")
+            return False
+    
+    def _copy_default_custom_from_template(self, dst_file):
+        """從範本複製 default.custom.yaml"""
         # 優先從 rime_files 目錄複製
         rime_files_dir = self.project_root / "rime_files"
         rime_files_src = rime_files_dir / "default.custom.yaml"
 
         if rime_files_src.exists():
-            dst_file = self.rime_dir / "default.custom.yaml"
             shutil.copy2(rime_files_src, dst_file)
             print("✅ 已複製新的 default.custom.yaml (從 rime_files)")
             return True
@@ -207,12 +302,11 @@ class RimeInstaller:
         config_src = config_dir / "default.custom.yaml"
 
         if config_src.exists():
-            dst_file = self.rime_dir / "default.custom.yaml"
             shutil.copy2(config_src, dst_file)
             print("✅ 已複製新的 default.custom.yaml (從 config)")
             return True
         else:
-            print("⚠️  找不到 default.custom.yaml")
+            print("⚠️  找不到 default.custom.yaml 範本")
             return False
 
     def deploy_rime(self):
@@ -305,7 +399,7 @@ def main():
 
     except KeyboardInterrupt:
         print("\n❌ 安裝被使用者中斷")
-    except Exception as e:
+    except (OSError, shutil.Error) as e:
         print(f"\n❌ 安裝過程中發生錯誤: {e}")
 
     input("\n按 Enter 鍵結束...")
