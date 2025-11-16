@@ -8,7 +8,7 @@
 
 ### 三個主要 Job
 
-```
+```Bash
 build-windows-installer (Windows)
          ↓
     [產生 installer.zip]
@@ -29,6 +29,7 @@ build-bundles (Ubuntu)
 **執行環境**: Windows Latest
 
 **主要任務**:
+
 - 檢出程式碼
 - 設定 Python 3.11 環境
 - 安裝 PyInstaller
@@ -38,6 +39,7 @@ build-bundles (Ubuntu)
 - 上傳為 artifact
 
 **輸出檔案**:
+
 - `rime-bp-installer-{TAG}.zip`
 - `rime-bp-installer-{TAG}.zip.sha256`
 
@@ -46,6 +48,7 @@ build-bundles (Ubuntu)
 **執行環境**: Ubuntu Latest
 
 **主要任務**:
+
 - 根據 `release-include.txt` 打包 YAML 配置檔
 - 產生四個不同的方案包：
   - **ALL**: 完整版（所有方案）
@@ -56,6 +59,7 @@ build-bundles (Ubuntu)
 - 上傳為 artifact
 
 **輸出檔案**:
+
 - `rime-tlpa-all-{TAG}.zip`
 - `rime-tlpa-tlpa-{TAG}.zip`
 - `rime-tlpa-zu2-{TAG}.zip`
@@ -67,6 +71,7 @@ build-bundles (Ubuntu)
 **執行環境**: Ubuntu Latest
 
 **主要任務**:
+
 - 等待前兩個 job 完成
 - 下載所有 artifacts
 - 合併所有檔案
@@ -90,6 +95,7 @@ git push origin bp-1.0.0
 ```
 
 支援的標籤格式：
+
 - `v*` - 通用版本（如 v1.0.0）
 - `bp-*` - 閩拼專用版本
 - `zu-*` - 注音二式專用版本
@@ -112,19 +118,22 @@ git push origin bp-1.0.0
 每次發行會包含以下檔案：
 
 ### Windows 安裝程式
+
 - `rime-bp-installer-{TAG}.zip` - Windows 一鍵安裝包
-  - 包含 `rime_installer.exe`
-  - 包含所有必要的 RIME 配置檔案
-  - 包含 config 目錄
-  - 包含安裝說明
+- 包含 `rime_installer.exe`
+- 包含所有必要的 RIME 配置檔案
+- 包含 config 目錄
+- 包含安裝說明
 
 ### YAML 配置包（手動安裝用）
+
 - `rime-tlpa-all-{TAG}.zip` - 完整版
 - `rime-tlpa-tlpa-{TAG}.zip` - TLPA 方案
 - `rime-tlpa-zu2-{TAG}.zip` - 注音二式方案
 - `rime-tlpa-bp-{TAG}.zip` - 閩拼方案
 
 ### 校驗碼
+
 每個 ZIP 檔都附帶 `.sha256` 校驗檔案
 
 ## 使用者安裝流程
@@ -138,6 +147,7 @@ git push origin bp-1.0.0
 5. 重新部署 RIME
 
 **優點**：
+
 - ✅ 自動備份現有配置
 - ✅ 一鍵完成安裝
 - ✅ 無需手動複製檔案
@@ -150,6 +160,7 @@ git push origin bp-1.0.0
 3. 手動重新部署 RIME
 
 **適用情境**：
+
 - 進階使用者
 - 需要自訂配置
 - Linux/macOS 使用者
@@ -159,6 +170,7 @@ git push origin bp-1.0.0
 ### 準備發行新版本
 
 1. **確認所有變更已提交**
+
    ```bash
    git status
    git add .
@@ -166,27 +178,32 @@ git push origin bp-1.0.0
    ```
 
 2. **更新版本號**（如果有 version_info.txt）
+
    ```bash
    echo "v1.0.0" > version_info.txt
    git commit -am "Bump version to v1.0.0"
    ```
 
 3. **推送到 GitHub**
+
    ```bash
    git push origin main
    ```
 
 4. **建立並推送版本標籤**
+
    ```bash
    git tag v1.0.0
    git push origin v1.0.0
    ```
 
 5. **等待 GitHub Actions 完成**
+
    - 進入 GitHub Actions 頁面查看進度
    - 通常需要 5-10 分鐘
 
 6. **檢查 Release**
+
    - 進入 Releases 頁面
    - 確認所有檔案都已上傳
    - 測試下載連結
@@ -207,11 +224,13 @@ git push origin v1.0.0-beta.1
 ### 建置失敗
 
 1. **檢查 Actions 日誌**
+
    - 進入 GitHub Actions 頁面
    - 點擊失敗的 workflow
    - 查看詳細錯誤訊息
 
 2. **常見問題**：
+
    - `build_installer.py` 找不到檔案
      - 確認 `release-include.txt` 中列出的檔案都存在
    - PyInstaller 建置失敗
@@ -233,10 +252,12 @@ git push origin v1.0.0-beta.1
 
 1. 刪除失敗的 Release
 2. 刪除對應的 tag：
+
    ```bash
    git tag -d v1.0.0
    git push origin :refs/tags/v1.0.0
    ```
+
 3. 重新建立並推送 tag
 
 ## 技術細節
@@ -273,6 +294,7 @@ create-release:
 - **修訂號**: 向下相容的問題修正
 
 範例：
+
 - `v1.0.0` - 首次正式發行
 - `v1.1.0` - 新增功能
 - `v1.1.1` - 錯誤修正
