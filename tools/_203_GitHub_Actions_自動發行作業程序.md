@@ -1,8 +1,8 @@
-# GitHub Actions 自動建置與發行說明
+# GitHub Actions 自動發行作業程序
 
 ## 概述
 
-本專案的 GitHub Actions workflow 已更新，現在能夠自動建置 Windows 安裝程式並打包發行。
+本專案産出：【閩拚輸入法】，其【版本發行作業】，係透過：GitHub Actions workflow 自動完成【New Relase】作業。使用者在下載 New Release 産出之 .zip 壓縮檔，於完成解壓縮後，使用 rime-installer.exe 執行檔，完成輸入法之安裝作業。
 
 ## Workflow 架構
 
@@ -50,21 +50,14 @@ build-bundles (Ubuntu)
 **主要任務**:
 
 - 根據 `release-include.txt` 打包 YAML 配置檔
-- 產生四個不同的方案包：
-  - **ALL**: 完整版（所有方案）
-  - **TLPA**: 台羅拼音方案
-  - **ZU2**: 注音二式方案
-  - **BP**: 閩拼方案
+- 產生閩拚方案配置包
 - 生成 SHA256 校驗碼
 - 上傳為 artifact
 
 **輸出檔案**:
 
-- `rime-tlpa-all-{TAG}.zip`
-- `rime-tlpa-tlpa-{TAG}.zip`
-- `rime-tlpa-zu2-{TAG}.zip`
-- `rime-tlpa-bp-{TAG}.zip`
-- 對應的 `.sha256` 檔案
+- `rime-bp-{TAG}.zip` - 閩拚方案配置檔案
+- `rime-bp-{TAG}.zip.sha256` - SHA256 校驗碼
 
 ### 3. create-release
 
@@ -96,17 +89,17 @@ git push origin bp-1.0.0
 
 支援的標籤格式：
 
+支援的標籤格式：
+
 - `v*` - 通用版本（如 v1.0.0）
 - `bp-*` - 閩拼專用版本
-- `zu-*` - 注音二式專用版本
-- `kb-*` - 鍵盤練習工具版本
 
 ### 2. 手動觸發
 
 在 GitHub 網頁介面：
 
 1. 進入 **Actions** 頁面
-2. 選擇 **Build & Release YAML bundles** workflow
+2. 選擇 **Build & Release 閩拚輸入法 (BP)** workflow
 3. 點擊 **Run workflow**
 4. 填寫參數：
    - **Branch 或 commit**: 選擇要建置的分支（預設 main）
@@ -117,20 +110,17 @@ git push origin bp-1.0.0
 
 每次發行會包含以下檔案：
 
-### Windows 安裝程式
+### Windows 安裝程式（推薦）
 
 - `rime-bp-installer-{TAG}.zip` - Windows 一鍵安裝包
-- 包含 `rime_installer.exe`
-- 包含所有必要的 RIME 配置檔案
-- 包含 config 目錄
-- 包含安裝說明
+  - 包含 `rime_installer.exe`
+  - 包含所有必要的 RIME 配置檔案
+  - 包含 config 目錄
+  - 包含安裝說明
 
 ### YAML 配置包（手動安裝用）
 
-- `rime-tlpa-all-{TAG}.zip` - 完整版
-- `rime-tlpa-tlpa-{TAG}.zip` - TLPA 方案
-- `rime-tlpa-zu2-{TAG}.zip` - 注音二式方案
-- `rime-tlpa-bp-{TAG}.zip` - 閩拼方案
+- `rime-bp-{TAG}.zip` - 閩拼方案配置檔案
 
 ### 校驗碼
 
@@ -155,15 +145,15 @@ git push origin bp-1.0.0
 
 ### 方法二：手動安裝 YAML 配置
 
-1. 從 Release 頁面下載對應的方案 ZIP 檔
+1. 從 Release 頁面下載 `rime-bp-{版本}.zip`
 2. 解壓縮到 RIME 配置目錄：`%APPDATA%\Rime`
-3. 手動重新部署 RIME
+3. 手動重新部署 RIME（右鍵點擊系統匣 RIME 圖示 → 重新部署）
 
 **適用情境**：
 
 - 進階使用者
 - 需要自訂配置
-- Linux/macOS 使用者
+- Linux/macOS 使用者（需要自行調整）
 
 ## 開發流程
 

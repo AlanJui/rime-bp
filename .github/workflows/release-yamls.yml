@@ -1,4 +1,4 @@
-name: "Build & Release YAML bundles (ALL / TLPA / ZU2 / BP)"
+name: "Build & Release 閩拚輸入法 (BP)"
 
 permissions:
   contents: write # ★ 讓 GITHUB_TOKEN 可發 Release / 建 tag
@@ -114,7 +114,7 @@ jobs:
           fetch-depth: 0
           ref: ${{ steps.meta.outputs.REF }}
 
-      - name: Build 4 bundles (ALL/TLPA/ZU2/BP)
+      - name: Build BP bundle (閩拚方案)
         shell: bash
         env:
           TAG: ${{ steps.meta.outputs.TAG }}
@@ -122,140 +122,56 @@ jobs:
           set -euo pipefail
           shopt -s nullglob nocaseglob
 
-          echo "== [DEBUG] pwd: $(pwd) =="
-          ls -l *.yaml || true
-
-          PREFIX=""   # 若檔案不在根目錄，改成例如：PREFIX="rime/"
+          echo "== 建置閩拚方案配置包 =="
+          echo "工作目錄: $(pwd)"
 
           mkdir -p dist
 
-          make_zip() {
-            local name="$1"; shift
-            local listfile="$1"; shift
-            local zip="dist/rime-tlpa-${name}-${TAG}.zip"
+          # 從 release-include.txt 讀取要打包的檔案清單
+          BP_LIST="dist/bp.list"
 
-            if [[ -s "$listfile" ]]; then
-              echo ">>> Packing ${name} ($(wc -l < "$listfile") files)"
-              zip -j "$zip" -@ < "$listfile" >/dev/null
-              (cd dist && sha256sum "$(basename "$zip")" > "$(basename "$zip").sha256")
-              ls -lh "dist/$(basename "$zip")"
-            else
-              echo "::warning::Skip ${name} (no files)"
-            fi
-          }
-
-          # ---------- ALL ----------
-          # 1) 優先使用 release-include.txt；2) 不存在就抓根目錄所有 *.yaml
-          ALL_LIST="dist/_all.list"
           if [[ -f release-include.txt ]]; then
-            echo "Use release-include.txt for ALL"
+            echo "讀取 release-include.txt 中的檔案清單..."
             awk 'NR==1{sub(/^\xef\xbb\xbf/,"")}{print}' release-include.txt \
               | sed -e 's/\r$//' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' \
               | sed -e '/^$/d' -e '/^#/d' \
-              | while read -r p; do
-                  [[ -z "$p" ]] && continue
-                  f="${PREFIX}${p}"
-                  [[ -f "$f" ]] && echo "$f"
-                done > "$ALL_LIST"
+              | while read -r filename; do
+                  [[ -z "$filename" ]] && continue
+                  if [[ -f "$filename" ]]; then
+                    echo "$filename"
+                  else
+                    echo "::warning::檔案不存在: $filename"
+                  fi
+                done > "$BP_LIST"
+
+            file_count=$(wc -l < "$BP_LIST")
+            echo "找到 $file_count 個檔案"
+
+            # 顯示檔案清單（用於除錯）
+            echo "檔案清單:"
+            cat "$BP_LIST"
+
+            # 打包成 ZIP
+            if [[ $file_count -gt 0 ]]; then
+              zip_file="dist/rime-bp-${TAG}.zip"
+              echo ">>> 打包閩拚方案配置 ($file_count 個檔案)"
+              zip -j "$zip_file" -@ < "$BP_LIST"
+
+              # 生成 SHA256 校驗碼
+              (cd dist && sha256sum "$(basename "$zip_file")" > "$(basename "$zip_file").sha256")
+
+              echo "✅ 打包完成:"
+              ls -lh "$zip_file"
+              echo "SHA256:"
+              cat "${zip_file}.sha256"
+            else
+              echo "::error::沒有找到要打包的檔案"
+              exit 1
+            fi
           else
-            echo "No release-include.txt, fallback to *.yaml"
-            : > "$ALL_LIST"
-            for f in ${PREFIX}*.yaml; do
-              [[ -f "$f" ]] && echo "$f" >> "$ALL_LIST"
-            done
+            echo "::error::找不到 release-include.txt 檔案"
+            exit 1
           fi
-
-          # ---------- COMMON：各方案共用 ----------
-          COMMON_LIST="dist/_common.list"
-          : > "$COMMON_LIST"
-          for p in \
-            rime.lua \
-            keymap_piau_tian.yaml \
-            lib_hau_suan_ji_tuann.yaml \
-            lib_phing_im.yaml \
-            lib_sip_ngoo_im.yaml \
-            lib_sip_ngoo_im2.yaml \
-            lib_zu_im.yaml
-          do
-            f="${PREFIX}${p}"
-            [[ -f "$f" ]] && echo "$f" >> "$COMMON_LIST" || echo "::warning::Missing COMMON: $f"
-          done
-
-          # ---------- TLPA 專屬 ----------
-          TLPA_LIST="dist/_tlpa.list"
-          : > "$TLPA_LIST"
-          for pat in \
-            tlpa_*.yaml tlpa_*.schema.yaml \
-            tl_ji_khoo_*.dict.yaml
-          do
-            for f in ${PREFIX}${pat}; do
-              [[ -f "$f" ]] && echo "$f" >> "$TLPA_LIST"
-            done
-          done
-          # 排除任何 *kb*（鍵盤練習工具）
-          sed -i -e '/kb.*\.schema\.yaml/Id' "$TLPA_LIST" || true
-
-          # ---------- 注音二式（ZU2）專屬 ----------
-          ZU2_LIST="dist/_zu2.list"
-          : > "$ZU2_LIST"
-          for pat in \
-            zu_im_2*.yaml zu_im_2*.schema.yaml
-          do
-            for f in ${PREFIX}${pat}; do
-              [[ -f "$f" ]] && echo "$f" >> "$ZU2_LIST"
-            done
-          done
-          sed -i -e '/kb.*\.schema\.yaml/Id' "$ZU2_LIST" || true
-
-          # ---------- BP 專屬 ----------
-          BP_LIST="dist/_bp.list"
-          : > "$BP_LIST"
-          for pat in \
-            bp_*.yaml bp_*.schema.yaml
-          do
-            for f in ${PREFIX}${pat}; do
-              [[ -f "$f" ]] && echo "$f" >> "$BP_LIST"
-            done
-          done
-          sed -i -e '/kb.*\.schema\.yaml/Id' "$BP_LIST" || true
-
-          # ---------- 鍵盤練習工具（只放 All） ----------
-          KB_LIST="dist/_kb.list"
-          : > "$KB_LIST"
-          for pat in \
-            kb_*.schema.yaml \
-            *_kb*.schema.yaml
-          do
-            for f in ${PREFIX}${pat}; do
-              [[ -f "$f" ]] && echo "$f" >> "$KB_LIST"
-            done
-          done
-
-          # --------- 合併清單 ----------
-          sort -u "$ALL_LIST" > dist/all.final
-          cat "$COMMON_LIST" "$TLPA_LIST" | sort -u > dist/tlpa.final
-          cat "$COMMON_LIST" "$ZU2_LIST"  | sort -u > dist/zu2.final
-          cat "$COMMON_LIST" "$BP_LIST"   | sort -u > dist/bp.final
-
-          # All 另外把 KB 與 COMMON 也併進去（確保 rime.lua 等共用檔被包含）
-          cat dist/all.final "$COMMON_LIST" "$KB_LIST" | sort -u > dist/all.plus
-
-          # 簡易偵測：確認 rime.lua 是否出現在各包清單
-          for pkg in tlpa zu2 bp; do
-            echo "[DEBUG] ${pkg}.final lines: $(wc -l < dist/${pkg}.final)"
-            grep -n "rime\.lua" "dist/${pkg}.final" || echo "[DEBUG] rime.lua not found in dist/${pkg}.final"
-          done
-          echo "[DEBUG] all.plus lines: $(wc -l < dist/all.plus)"
-          grep -n "rime\.lua" dist/all.plus || echo "[DEBUG] rime.lua not found in all.plus (will still proceed)"
-
-          echo "== COUNT =="
-          echo "ALL: $(wc -l < dist/all.plus) | TLPA: $(wc -l < dist/tlpa.final) | ZU2: $(wc -l < dist/zu2.final) | BP: $(wc -l < dist/bp.final)"
-
-          # --------- 打包 ----------
-          make_zip "all"  "dist/all.plus"
-          make_zip "tlpa" "dist/tlpa.final"
-          make_zip "zu2"  "dist/zu2.final"
-          make_zip "bp"   "dist/bp.final"
 
       - name: Upload YAML bundles artifact
         uses: actions/upload-artifact@v4
@@ -313,35 +229,39 @@ jobs:
           body: |
             ## RIME 閩拚輸入法 ${{ steps.meta.outputs.TAG }}
 
-            ### 📦 安裝程式（推薦）
+            ### 📦 Windows 安裝程式（推薦）
 
-            **Windows 使用者**：
+            **適用於 Windows 使用者**：
             1. 下載 `rime-bp-installer-${{ steps.meta.outputs.TAG }}.zip`
             2. 解壓縮後執行 `rime_installer.exe`
             3. 按照程式指示完成安裝
 
+            **優點**：
+            - ✅ 自動備份現有配置
+            - ✅ 一鍵完成安裝
+            - ✅ 無需手動複製檔案
+
             ### 📋 手動安裝包
 
-            - **rime-tlpa-all-${{ steps.meta.outputs.TAG }}.zip**: 完整版（包含所有方案）
-            - **rime-tlpa-tlpa-${{ steps.meta.outputs.TAG }}.zip**: TLPA 台羅拼音方案
-            - **rime-tlpa-zu2-${{ steps.meta.outputs.TAG }}.zip**: 注音二式方案
-            - **rime-tlpa-bp-${{ steps.meta.outputs.TAG }}.zip**: 閩拼方案
+            **rime-bp-${{ steps.meta.outputs.TAG }}.zip**: 閩拚方案配置檔案
 
-            ### 📝 安裝說明
-
-            **使用安裝程式**（推薦）：
-            - 適用於所有 Windows 使用者
-            - 自動備份現有配置
-            - 一鍵完成安裝
-
-            **手動安裝**：
-            1. 下載對應的 ZIP 檔案
+            **手動安裝步驟**：
+            1. 下載 `rime-bp-${{ steps.meta.outputs.TAG }}.zip`
             2. 解壓縮到 RIME 配置目錄：`%APPDATA%\Rime`
-            3. 重新部署 RIME
+            3. 重新部署 RIME（右鍵點擊系統匣 RIME 圖示 → 重新部署）
+
+            ### 📝 系統需求
+
+            - RIME 小狼毫輸入法（Windows）
+            - 下載網址：https://rime.im/
+
+            ### 🔐 檔案驗證
+
+            每個 ZIP 檔案都附帶 `.sha256` 校驗檔案，可用於驗證下載完整性。
 
             ---
 
-            SHA256 校驗碼請參考 `.sha256` 檔案
+            閩拚輸入法專案 | 閩南語羅馬字母拼音系統
           files: |
             release-files/*.zip
             release-files/*.sha256
