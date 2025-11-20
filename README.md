@@ -42,21 +42,7 @@
 
 請參考[使用安裝程式安裝作業](https://github.com/AlanJui/rime-bp/wiki/%E4%BD%BF%E7%94%A8%E5%AE%89%E8%A3%9D%E7%A8%8B%E5%BC%8F%E5%AE%89%E8%A3%9D%E4%BD%9C%E6%A5%AD)之操作指引，完成【閩拚輸入方案】之下載及安裝。
 
-### 四聲八調之調名、調號與五度標記調值
-
-<img align="top" width="400" height="" alt="image" src="https://github.com/user-attachments/assets/ceeb0903-ab26-40f4-a5b0-41953c5e82d0" />
-
-<br/><br/>
-
-<img align="top" width="400" height="" alt="image" src="https://github.com/user-attachments/assets/2a9bb132-a38b-4bf5-b289-d72c1ca5b6d7" />
-
-### W聲調圖
-
-<img alt="image" src="https://github.com/user-attachments/assets/dc785e8f-01f0-4d00-be7d-dc64275cc170" />
-
-### 聲調與按鍵對映
-
-<img alt="image" src="https://github.com/user-attachments/assets/996c8da9-add8-4340-92bc-3273879f171d" />
+---
 
 ## 注音輸入法
 
@@ -175,6 +161,7 @@
 - [RIME輸入法 - 閩南語輸入方案](https://github.com/a-thok/rime-hokkien)
 
 - [rime-hokkien-poj](https://github.com/yangwenbo99/rime-hokkien-poj)
+
 
 
 
