@@ -40,7 +40,7 @@
 
 2. **下載及安裝【閩拚輸入法】**。
 
-請參考 [Wiki](https://github.com/AlanJui/rime-bp/wiki) 中的操作指引文件。
+請參考 [使用安裝程式安裝作業]([https://github.com/AlanJui/rime-bp/wiki](https://github.com/AlanJui/rime-bp/wiki/%E4%BD%BF%E7%94%A8%E5%AE%89%E8%A3%9D%E7%A8%8B%E5%BC%8F%E5%AE%89%E8%A3%9D%E4%BD%9C%E6%A5%AD)) 之操作指引，完成【閩拚輸入方案】之下載及安裝。
 
 ### 四聲八調之調名、調號與五度標記調值
 
@@ -175,6 +175,7 @@
 - [RIME輸入法 - 閩南語輸入方案](https://github.com/a-thok/rime-hokkien)
 
 - [rime-hokkien-poj](https://github.com/yangwenbo99/rime-hokkien-poj)
+
 
 
 
