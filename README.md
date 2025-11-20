@@ -21,12 +21,9 @@
 
 ![2025-11-16_20-05-45](https://github.com/user-attachments/assets/39b91a19-4652-43bc-af81-291a4ccd8cc7)
 
+## 安裝流程
 
-## 安裝作業
-
-RIME 在不同作業系統之間，各有不同的「軟體套件名稱」。其下載、安裝操作細節，請
-參考 [Wiki](https://github.com/AlanJui/rime-tlpa/wiki) 中的操作指引文件。以下
-說明為下載及安裝作業之摘要參考。
+以下說明為下載及安裝作業之摘要參考。
 
 1. **下載及安裝 [RIME 中州韻輸入法引擎](http://rime.im)**；
 
@@ -41,63 +38,9 @@ RIME 在不同作業系統之間，各有不同的「軟體套件名稱」。其
    及 fcit5-rime 共三種。所以，在安裝 RIME 之前，得先確認 Linux 作業
    系統安裝的【輸入法框架】為何者。
 
-2. **下載及安裝本專案産出之【輸入法相關檔案】**；
+2. **下載及安裝【閩拚輸入法】**。
 
-3. **編輯 RIME 設定檔；或使用小狼毫提供之圖形設定工具【輸入法設定】，以便啟用輸入法方案**；
-
-   **【使用輸入法設定工具】**
-
-   透過小狼毫提供之圖形介面（GUI）工具【輸入法設定】，安裝 RIME 輸入方案。
-
-     <img alt="2025-10-02_13-33-12" src="https://github.com/user-attachments/assets/6eda9d74-14df-49b6-af03-9bbfb3adf662" />
-
----
-
-1.  將中文輸入法切換成【小狼毫】。
-
-  <img alt="image" src="https://github.com/user-attachments/assets/68b7892d-15dd-46db-93f0-51b1ea6d896b" />
-
-2.  將滑鼠指標指向【小狼毫輸入法】圖示，按下【滑鼠右鍵】。
-
-  <img alt="image" src="https://github.com/user-attachments/assets/97257079-fcf6-42a8-a77d-f2a24d396b31" />
-
-   3. 自【快顯功能表】選擇【輸入法設定】指令。
-
-  <img alt="image" src="https://github.com/user-attachments/assets/15471158-5944-4f6d-aa19-2442f75d3745" />
-
-4.  在【方案選單】可瀏覽已安裝之小狼毫輸入方案。
-
-  <img alt="image" src="https://github.com/user-attachments/assets/d8aa05ab-6694-4544-8df4-f7348115d0c8" />
-
-   5. 點擊【核取方塊】，當呈現【勾選】狀態，表小狼毫【啟用】該輸入方案；若呈現【取消】狀態，表小狼毫【停用】該輸入方案。
-
-  <img alt="image" src="https://github.com/user-attachments/assets/ffd4f783-b622-4aa9-a039-215d5b6840f1" />
-
-   6. 點擊【中】按鈕，完成【小狼毫輸入方案】之【啟用/停用】設定。
-
-  <img alt="image" src="https://github.com/user-attachments/assets/663fd80a-d2a1-4383-823f-cd38150393ca" />
-
-7.  自視窗之左側，先選用【小狼毫介面風格】，然後再按【中】按鈕，完成設定。
-
-  <img alt="image" src="https://github.com/user-attachments/assets/fb454f75-eb96-4acf-bd4f-bffe095cbbee" />
-
----
-
-**【編輯 RIME 設定檔】**
-
-RIME 設定檔名稱為：`default.custom.yaml`，各作業系統之 RIME 設定檔存放
-`目錄路徑（資料夾）`條列如下：
-
-- 鼠鬚管(macOS)：`~/Library/Rime/`
-
-- 小狼毫(Windows)：`"%APPDATA%\Rime"`
-
-- 中州韻(Linux)：`~/.config/ibus/rime/`
-
-<img width="979" height="666" alt="image" src="https://github.com/user-attachments/assets/b8f2ab26-0bca-45fc-bd46-5fc56b243965" />
-
-4. **重新部署 RIME 輸入法**：將作業系統使用中的輸入法，先切換成 RIME，再執行 RIME
-   輸入法中的「重新部署」指令。
+請參考 [Wiki](https://github.com/AlanJui/rime-bp/wiki) 中的操作指引文件。
 
 ### 四聲八調之調名、調號與五度標記調值
 
@@ -232,5 +175,6 @@ RIME 設定檔名稱為：`default.custom.yaml`，各作業系統之 RIME 設定
 - [RIME輸入法 - 閩南語輸入方案](https://github.com/a-thok/rime-hokkien)
 
 - [rime-hokkien-poj](https://github.com/yangwenbo99/rime-hokkien-poj)
+
 
 
