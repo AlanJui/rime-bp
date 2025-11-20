@@ -15,5 +15,5 @@ bp_phing_im.schema.yaml
 bp_ji_khoo.dict.yaml
 
 # 其他檔案...
-requirements.txt
+# requirements.txt
 packing_list.txt

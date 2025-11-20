@@ -5,6 +5,10 @@ customization:
   modified_time: "Tue May 21 13:16:43 2024"
   rime_version: 1.11.2
 patch:
+  "translator/enable_completion": false   # 關掉未輸入完就補字
+  "translator/enable_sentence": false     # 不組長句
+  "speller/auto_select": false            # 禁止自動選第一候選
+  "translator/enable_user_dict": false    # 不參考使用者詞典（可視需求再打開）
   "style/inline_preedit": true  # 內嵌編碼（僅支持TSF）
   # 候選視窗：每頁 5 個（前端設定，會覆蓋 schema 的 menu.page_size）
   "style/horizontal": false
