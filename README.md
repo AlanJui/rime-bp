@@ -51,7 +51,7 @@
 
 ## 聲調按鍵
 
-<img width="1046" height="578" alt="image" src="https://github.com/user-attachments/assets/65529735-2aeb-4f62-a799-9be8632aa0d6" />
+<img width=800px height="578" alt="image" src="https://github.com/user-attachments/assets/65529735-2aeb-4f62-a799-9be8632aa0d6" />
 
 ---
 
@@ -110,6 +110,7 @@
 - [RIME輸入法 - 閩南語輸入方案](https://github.com/a-thok/rime-hokkien)
 
 - [rime-hokkien-poj](https://github.com/yangwenbo99/rime-hokkien-poj)
+
 
 
 
