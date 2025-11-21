@@ -47,7 +47,7 @@
 
 ### 鍵盤按鍵
 
-<img alt="image" src="https://github.com/AlanJui/rime-tlpa/raw/main/docs/static/img/ping_im_gian_buann.png" />
+<img width=800px src="https://github.com/AlanJui/rime-tlpa/raw/main/docs/static/img/ping_im_gian_buann.png" />
 
 ## 聲調按鍵
 
@@ -110,6 +110,7 @@
 - [RIME輸入法 - 閩南語輸入方案](https://github.com/a-thok/rime-hokkien)
 
 - [rime-hokkien-poj](https://github.com/yangwenbo99/rime-hokkien-poj)
+
 
 
 
