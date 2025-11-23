@@ -63,7 +63,8 @@
 
 ### 方音符號按鍵
 
-<img alt="image" src="https://github.com/user-attachments/assets/737558c8-e04d-458a-b3a7-2f5b601595f9" />
+<img width=1000px alt="image" src="https://github.com/user-attachments/assets/bf38e43a-699b-4bff-93fd-4d564bc79eb3" />
+
 
 ### 聲調按鍵
 
@@ -110,6 +111,7 @@
 - [RIME輸入法 - 閩南語輸入方案](https://github.com/a-thok/rime-hokkien)
 
 - [rime-hokkien-poj](https://github.com/yangwenbo99/rime-hokkien-poj)
+
 
 
 
