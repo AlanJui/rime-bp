@@ -271,13 +271,13 @@ speller:
     # (3) ak, ik, ok, iak, iok
     # (4) ah, ih, uh, eh, ooh, oh, aih, auh, iah, iuh, ioh, uah, uih, ueh, iauh, uaih
     #==========================================================================
-    # 【字典編碼】：【9】 ==> 所有的【入聲韻尾】
+    # 【字典編碼】：【&】 ==> 所有的【入聲韻尾】
     - derive/p([78])/P$1/
     - derive/t([78])/T$1/
     - derive/k([78])/K$1/
     - derive/h([78])/V$1/
     # - abbrev/([ptkh]|[PTKV])[78]/9/
-    - abbrev/[ptkh][78]/9/
+    - abbrev/[ptkh][78]/&/
     #--------------------------------------------------------------------------
     # 令【入聲韻尾】注音符號的輸入，亦可利用【聲母】的【注音符號】來輸入，以利使用者可省去背記太多按鍵之苦。
     - derive/p([78])/b$1/
@@ -314,7 +314,7 @@ speller:
     # 【.】==>【L】==>【ㄥ】 # 鼻音韻母前綴符號
     # 【-】==>【*】==>【ｎ】 # 所有鼻音韻母
     #==========================================================================
-    - xlit|mBbpndtlŋvgkZzcsJjCShaiwueOoIURDXEQxyMNGY@AWHPTKV176532809L*|a!1qs2wxNEedYyhnRrfvc8uKj,ik9l*UJ<I(Lmp/M0;Oobtgz:[5346]7.?-|
+    - xlit|mBbpndtlŋvgkZzcsJjCShaiwueOoIURDXEQxyMNGY@AWHPTKV17653280&L*|a!1qs2wxNEedYyhnRrfvc8uKj,ik9l*UJ<I(Lmp/M0;Oobtgz:[5346]7.?-|
 
 
 translator:
