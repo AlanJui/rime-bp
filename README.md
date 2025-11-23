@@ -51,7 +51,8 @@
 
 ## 聲調按鍵
 
-<img width=800px height="578" alt="image" src="https://github.com/user-attachments/assets/65529735-2aeb-4f62-a799-9be8632aa0d6" />
+<img width=1000px alt="image" src="https://github.com/user-attachments/assets/4310aaa0-38cf-475b-8aa6-c210eb58de60" />
+
 
 ---
 
@@ -59,26 +60,19 @@
 
 ### 方音符號
 
-<img alt="image" src="https://github.com/AlanJui/rime-tlpa/raw/main/docs/static/img/zu_im_hong_im.png" />
+<img width=1000px alt="image" src="https://github.com/AlanJui/rime-tlpa/raw/main/docs/static/img/zu_im_hong_im.png" />
 
 ### 方音符號按鍵
 
-<img width=1000px alt="image" src="https://github.com/user-attachments/assets/bf38e43a-699b-4bff-93fd-4d564bc79eb3" />
+<img width=1000px alt="image" src="https://github.com/user-attachments/assets/38f0389e-167e-474d-8073-9bc099db5728" />
+
 
 
 ### 聲調按鍵
 
-| 調號 | 四聲八調   | 聲調按鍵 | 漢字 | 台語音標 | 按鍵輸入  |
-| :--: | :--------- | :------: | :--: | :------- | :-------- |
-|  1   | 陰平 (ㄚ)  |  \<SP\>  |  東  | tong1    | ㄊㆲ      |
-|  2   | 陰上 (ㄚˋ) |    4     |  黨  | tong2    | ㄊㆲˋ     |
-|  3   | 陰去 (ㄚ˪) |    3     |  棟  | tong3    | ㄊㆲ˪     |
-|  4   | 陰入 (ㄚ˙) |    7     |  督  | tok4     | ㄊㆦㄎ    |
-|  5   | 陽平 (ㄚˊ) |    6     |  同  | tong5    | ㄊㆲˊ     |
-|  6   | 陽上 (ㄚˋ) |    4     |  動  | tong6    | ㄊㆲˋ     |
-|  7   | 陽去 (ㄚ˫) |    5     |  洞  | tong7    | ㄊㆲ˫     |
-|  8   | 陽入 (ㄚ˙) |    7     |  毒  | tok8     | ㄊㆦㄎ˙   |
-|  0   | 輕聲 (ㄚ˙) |    7     |  㧒  | hiat0    | ㄏㄧㄚㄊ˙ |
+<img width=1000px alt="image" src="https://github.com/user-attachments/assets/a716a57a-171f-4cfe-a947-b5c551e9dc6c" />
+
+
 
 **【參考文章】**：
 
@@ -111,6 +105,7 @@
 - [RIME輸入法 - 閩南語輸入方案](https://github.com/a-thok/rime-hokkien)
 
 - [rime-hokkien-poj](https://github.com/yangwenbo99/rime-hokkien-poj)
+
 
 
 
